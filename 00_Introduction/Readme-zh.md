@@ -4,8 +4,6 @@
 
 希望这些东西对你我都有用！
 
-
-
 ## 旅程的目标
 
 以下是我在这段旅程中的所有目标：
@@ -62,26 +60,21 @@
 
  + [Translate（转换）](https://en.wikipedia.org/wiki/Code_generation_(compiler))
 
-   将输入内容的意思翻译成另一个语言，在这个步骤我们将转换输出部分时间，the meaning of the input into a different language. Here we
-   convert the input, parts at a time, into a lower-level language.
+   将输入内容转译成另一个语言，在这个步骤中编译器会逐步将输入内容转译成低级语言。.
 
-## Resources
+## 资源
 
-There's a lot of compiler resources out on the Internet. Here are the ones
-I'll be looking at.
+以下是一些互联网上的编译器资源，我把我要看的那些都罗列到下方了。
 
-### Learning Resources
+### 学习资源
 
-If you want to start with some books, papers and tools on compilers,
-I'd highly recommend this list:
+如果你想要一些有关编译器的书、论文、工具的话，下面是我强烈推荐的有关前面我说的内容的列表：
 
   + [Curated list of awesome resources on Compilers, Interpreters and Runtimes](https://github.com/aalhour/awesome-compilers) by Ahmad Alhour
 
-### Existing Compilers
+### 现有的编译器
 
-While I'm going to build my own compiler, I plan on looking at other compilers
-for ideas and probably also borrow some of their code. Here are the ones
-I'm looking at:
+虽然是我自己做编译器，但我计划从别的编译器中获得一些灵感并且使用一些他们的代码，以下是我参考的编译器：
 
   + [SubC](http://www.t3x.org/subc/) by Nils M Holm
   + [Swieros C Compiler](https://github.com/rswier/swieros/blob/master/root/bin/c.c) by Robert Swierczek
@@ -92,33 +85,24 @@ I'm looking at:
   + [Small C](https://en.wikipedia.org/wiki/Small-C) by Ron Cain,
     James E. Hendrix, derivatives by others
 
-In particular, I'll be using a lot of the ideas, and some of the code,
-from the SubC compiler.
+此外，我将要从C子集编译器中使用部分点子和代码。
 
-## Setting Up the Development Environment
+## 环境搭建
 
-Assuming that you want to come along on this journey, here's what you'll
-need. I'm going to use a Linux development environment, so download and
-set up your favourite Linux system: I'm using Lubuntu 18.04.
+如果你想要完成编译器自建旅程，以下是你需要准备的东西，我们将基于Linux搭建开发环境，所以你得准备你最喜欢的Linux系统，反正我最喜欢的是 Lubuntu 18.04 平台。
 
-I'm going to target two hardware platforms: Intel x86-64 and 32-bit ARM.
-I'll use a PC running Lubuntu 18.04 as the Intel target, and a Raspberry
-Pi running Raspbian as the ARM target.
+我们的目标硬件平台为 Intel x86-64 和 32-bit ARM，我将使用一台运行 Lubuntu 18.04 系统的电脑作为 Intel 的目标，并使用一台运行 Raspbian 的 Raspberry Pi 作为 ARM 目标。
 
-On the Intel platform, we are going to need an existing C compiler.
-So, install this package (I give the Ubuntu/Debian commands):
+在 Intel 平台上，我们需要已经存在的 C 编译器，所以我们得先安装它（以下是 Ubuntu/Debian 系统的安装命令）：
 
-```
-  $ sudo apt-get install build-essential
+```bash
+$ sudo apt-get install build-essential
 ```
 
-If there are any more tools required for a vanilla Linux
-system, let me know.
+如果这里需要更多有关 Vanilla Linux 系统的工具，请告诉我。
 
-Finally, clone a copy of this Github repository.
+最后，从 GitHub 上拷贝这个仓库的副本。
 
-## The Next Step
+## 下一步
 
-In the next part of our compiler writing journey, we will start with
-the code to scan our input file and find the *tokens* that are the
-lexical elements of our language. [Next step](../01_Scanner/Readme.md)
+在我们书写编译器旅程的下一步分钟，我们将要开始编码，去扫描我们的输入文件并且找到所谓的当前语言的语法元素 *tokens*  [Next step](../01_Scanner/Readme.md)。
