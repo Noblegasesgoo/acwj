@@ -89,7 +89,7 @@ static int skip(void) {
 }
 ```
 
-## 扫描Tokens：scan()
+## 扫描Tokens：`scan()`
 
 所以现在我们可以读取到我们需要的字符了；如果我们读取了一个多余的字符，我们也可以将其放回。我们现在就可以写我们的第一个词法扫描器了：
 
@@ -128,23 +128,16 @@ int scan(struct token *t) {
 }
 ```
 
-That's it for the simple one-character tokens: for each recognised
-character, turn it into a token. You may ask: why not just put
-the recognised character into the `struct token`? The answer is that later
-we will need to recognise multi-character tokens such as `==` and keywords
-like `if` and `while`. So it will make life easier to have an enumerated
-list of token values.
+以上就是对于简单字符`tokens`标记的内容了：每一个被识别的字符，都会变成一个`token`。你也许会说：为什么不直接将被识别的字符放入`struct token`中呢？我们之后将要对例如 `==` 以及`if` `where`关键字这样的多字符tokens进行标记时会给你答案。因此，有一个枚举的标记值列表会让事情变得更加简便。
 
-## Integer Literal Values
+## 整数字面值的值
 
-In fact, we already have to face this situation as we also need to
-recognise integer literal values like `3827` and `87731`. Here is the
-missing `default` code from the `switch` statement:
+事实上，我们不得不去面对需要去标记类似`3827`和`87731`这样整数字面值的情况。以下是`switch`段中缺少的`default`代码：
 
 ```c
   default:
 
-    // If it's a digit, scan the
+    // If it's a digit, scan the 如果是数字，就扫描他的整数字面量
     // literal integer value in
     if (isdigit(c)) {
       t->intvalue = scanint(c);
@@ -156,55 +149,43 @@ missing `default` code from the `switch` statement:
     exit(1);
 ```
 
-Once we hit a decimal digit character, we call the helper function `scanint()`
-with this first character. It will return the scanned integer value. To
-do this, it has to read each character in turn, check that it's a
-legitimate digit, and build up the final number. Here is the code:
+一旦我们遇到一个十进制数字字符，我们调用名为`scanint()`的辅助函数，并将第一个字符作为参数传递给它。该函数会返回扫描到的整数值。为了实现这一点，函数将会读取每一个输入字符，检查是否是合法的数字并且构建最终数字，以下是代码：
 
 ```c
-// Scan and return an integer literal
-// value from the input file. Store
+// Scan and return an integer literal 从输入文件中扫描并返回整数字面量
+// value from the input file. Store 将值作为字符串存储在Text中
 // the value as a string in Text.
 static int scanint(int c) {
   int k, val = 0;
 
-  // Convert each character into an int value
+  // Convert each character into an int value 转换每一个字符为int值
   while ((k = chrpos("0123456789", c)) >= 0) {
     val = val * 10 + k;
     c = next();
   }
 
-  // We hit a non-integer character, put it back.
+  // We hit a non-integer character, put it back. 当我们遇到一个非整数字符是，将其放回
   putback(c);
   return val;
 }
 ```
 
-We start with a zero `val` value. Each time we get a character
-in the set `0` to `9` we convert this to an `int` value with
-`chrpos()`. We make `val` 10 times bigger and then add this new
-digit to it.
+我们以为0的`val`值开始，每次我从`0，9`的范围中获取一个字符串我们就用 `chrpos()`函数来将其转换为`int`值。我们将`val`变大十倍，并且将这个新数字添加到其中。
 
-For example, if we have the characters `3`, `2`, `8`, we do:
+举个🌰，如果我们有字符集  `3`, `2`, `8`, 我们要将其转换成`328`我们这么做：
 
- + `val= 0 * 10 + 3`, i.e. 3
- + `val= 3 * 10 + 2`, i.e. 32
- + `val= 32 * 10 + 8`, i.e. 328
+- `val = 0 * 10 + 3`，即3
+- `val = 3 * 10 + 2`，即32
+- `val = 32 * 10 + 8`，即328
 
-Right at the end, did you notice the call to `putback(c)`?
-We found a character that's not a decimal digit at this point.
-We can't simply discard it, but luckily we can put it back
-in the input stream to be consumed later.
+在最后，你有没有注意到一个名为 `putback(c)` 的函数（您注意到了对`putback(c)`的调用吗？）？在这里我们找到一个不属于十进制数字的字符。我们不能简单的将他丢弃，但幸运的是我们可以将其放回到输出流中以便之后使用。
 
-You may also ask at this point: why not simply subtract the ASCII value of 
-'0' from `c` to make it an integer? The answer is that, later on, we will
-be able to do `chrpos("0123456789abcdef")` to convert hexadecimal digits
-as well.
+你也许会询问这个点：为什么不用 ASCII 码的 '0' 到`c`简单的减去该字符从而获得该字符的整形值呢？稍后我们会使用`chrpos("0123456789abcdef")` 函数将十六进制数字进行转换便是答案。
 
-Here's the code for `chrpos()`:
+以下是 `chrpos()` 的代码：
 
 ```c
-// Return the position of character c
+// Return the position of character c 返回字符c位于字符串s中的位置，找不到的话就返回-1
 // in string s, or -1 if c not found
 static int chrpos(char *s, int c) {
   char *p;
@@ -214,12 +195,11 @@ static int chrpos(char *s, int c) {
 }
 ```
 
-And that's it for the lexical scanner code in `scan.c` for now.
+这些暂时就是目前词法分析扫描器中的代码内容了。
 
-## Putting the Scanner to Work
+## 让词法分析扫描器开始工作
 
-The code in `main.c` puts the above scanner to work. The `main()`
-function opens up a file and then scans it for tokens:
+下面`main.c` 的代码将上述内容中的词法分析扫描器投入使用。该函数打开一个文件，然后扫描其中的tokens：
 
 ```c
 void main(int argc, char *argv[]) {
@@ -233,15 +213,17 @@ void main(int argc, char *argv[]) {
 }
 ```
 
+接着 `scanfile()` 在存在新标记时循环，并打印出标记的详细信息：
+
 And `scanfile()` loops while there is a new token and prints out the
 details of the token:
 
 ```c
-// List of printable tokens
+// List of printable tokens 可打印的标记列表
 char *tokstr[] = { "+", "-", "*", "/", "intlit" };
 
-// Loop scanning in all the tokens in the input file.
-// Print out details of each token found.
+// Loop scanning in all the tokens in the input file. 循环扫描输入文件的所有token
+// Print out details of each token found. 打印所有找到的token的详细信息
 static void scanfile() {
   struct token T;
 
@@ -254,10 +236,9 @@ static void scanfile() {
 }
 ```
 
-## Some Example Input Files
+## 一些示例输入文件
 
-I've provided some example input files so you can see what tokens
-the scanner finds in each file, and what input files the scanner rejects.
+我提供了一些示例输入文件，你可以看看通过扫描器能从他们中扫描到些什么tokens以及看看哪些文件是被扫描器拒绝了的。
 
 ```
 $ make
@@ -292,16 +273,11 @@ Token intlit, value 45
 Unrecognised character . on line 3
 ```
 
-## Conclusion and What's Next
+## 总结及下一步
 
-We've started small and we have a simple lexical scanner that recognises
-the four main maths operators and also integer literal values. We saw
-that we needed to skip whitespace and put back characters if we read
-too far into the input.
+我们开始做了一个可以做标记四个数学运算符以及数字字面值的小而简易的词法分析扫描器。我们注意到如果读取输入时读取得太远，就需要跳过空白字符并将字符放回。
 
-Single character tokens are easy to scan, but multi-character tokens are
-a bit harder. But at the end, the `scan()` function returns the next token
-from the input file in a `struct token` variable:
+单个字符的tokens扫描起来是很简单的，但是如果是多个字符tokens的扫描就会变得比较麻烦。不过在最后，`scan()` 函数会将输入文件中的下一个标记返回到一个名为 `struct token` 的变量中：
 
 ```c
 struct token {
@@ -310,6 +286,4 @@ struct token {
 };
 ```
 
-In the next part of our compiler writing journey, we will build
-a recursive descent parser to interpret the grammar of our input
-files, and calculate & print out the final value for each file. [Next step](../02_Parser/Readme.md)
+在下一节中，我们会构建一个递归深入的解析器来解析我们输入文件的语法，计算并打印出每个文件的最终值[Next step](../02_Parser/Readme.md)。
