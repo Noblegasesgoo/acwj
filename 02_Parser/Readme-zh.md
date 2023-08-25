@@ -125,24 +125,21 @@ struct ASTnode {
 
 ## 构建AST节点和树
 
-The code in `tree.c` has the functions to build ASTs. The most
-general function, `mkastnode()`, takes values for all four
-fields in an AST node. It allocates the node, populates the field
-values and returns a pointer to the node:
+`tree.c`文件里有构造ASTs的代码。最通用的函数`mkastnode()`接受四个AST节点字段的值。它用来分配节点，填充字段值并且返回节点指针：
 
 ```c
-// Build and return a generic AST node
+// Build and return a generic AST node 构建并返回一个通用的AST节点
 struct ASTnode *mkastnode(int op, struct ASTnode *left,
                           struct ASTnode *right, int intvalue) {
   struct ASTnode *n;
 
-  // Malloc a new ASTnode
+  // Malloc a new ASTnode 分配新的AST节点
   n = (struct ASTnode *) malloc(sizeof(struct ASTnode));
   if (n == NULL) {
     fprintf(stderr, "Unable to malloc in mkastnode()\n");
     exit(1);
   }
-  // Copy in the field values and return it
+  // Copy in the field values and return it 复制字段值并返回它
   n->op = op;
   n->left = left;
   n->right = right;
@@ -151,16 +148,15 @@ struct ASTnode *mkastnode(int op, struct ASTnode *left,
 }
 ```
 
-Given this, we can write more specific functions that make a leaf AST
-node (i.e. one with no children), and make an AST node with a single child:
+鉴于此，我们可以编写更具体的用于创建一个叶子AST节点的函数（即没有子节点的节点），并且创建一个带有单个子节点的AST节点：
 
 ```c
-// Make an AST leaf node
+// Make an AST leaf node 创建一个AST叶子节点
 struct ASTnode *mkastleaf(int op, int intvalue) {
   return (mkastnode(op, NULL, NULL, intvalue));
 }
 
-// Make a unary AST node: only one child
+// Make a unary AST node: only one child 创建一个一元AST节点：只有一个子节点
 struct ASTnode *mkastunary(int op, struct ASTnode *left, int intvalue) {
   return (mkastnode(op, left, NULL, intvalue));
 ```
