@@ -161,18 +161,13 @@ struct ASTnode *mkastunary(int op, struct ASTnode *left, int intvalue) {
   return (mkastnode(op, left, NULL, intvalue));
 ```
 
-## Purpose of the AST
+## AST的目的
 
-We are going to use an AST to store each expression that we recognise
-so that, later on, we can traverse it recursively to calculate the
-final value of the expression. We do want to deal with the precedence of the 
-maths operators. Here is an example.
+我们将使用AST来存储我们识别出的每个表达式。这样之后我们就可以递归的遍历它来计算表达式的最终值。我们希望能处理数学运算符的优先级。下面是一个🌰：
 
-Consider the expression `2 * 3 + 4 * 5`. Now, multiplication has higher
-precedence that addition. Therefore, we want to *bind* the multiplication
-operands together and perform these operations before we do the addition.
+思考一下这个表达式`2 * 3 + 4 * 5`。现在，乘法运算符的优先级高于加法。因此，我们希望在进行加法操作之前将乘法操作数绑定在一起并执行这些操作。
 
-If we generated the AST tree to look like this:
+如果我们生成了这样一颗AST树：
 
 ```
           +
@@ -184,20 +179,14 @@ If we generated the AST tree to look like this:
     2   3   4   5
 ```
 
-then, when traversing the tree, we would perform `2*3` first, then `4*5`.
-Once we have these results, we can then pass them up to the root of the
-tree to perform the addition.
+然后当我们遍历树史，我们首先执行`2*3`，然后再执行`4*5`。一旦我们有了这些结果，我们就可以将其回传到树的根节点来执行加法。
 
-## A Naive Expression Parser
+## 一个简单的表达式解析器
 
-Now, we could re-use the token values from our scanner as the AST node
-operation values, but I like to keep the concept of tokens and AST nodes
-separate. So, to start with, I'm going to have a function to map
-the token values into AST node operation values. This, along with the
-rest of the parser, is in `expr.c`:
+现在，我们可以复用从我们扫描器中的标记值作为AST节点中的运算符值。不过我比较喜欢保持token与AST节点的概念分开来看。所以，首先我们要有一个函数来映射token的值与AST节点操作的值。以上内容以及解析器的其余部分都在 `expr.c`文件中：
 
 ```c
-// Convert a token into an AST operation.
+// Convert a token into an AST operation. 将token转换为AST操作符
 int arithop(int tok) {
   switch (tok) {
     case T_PLUS:
@@ -215,22 +204,19 @@ int arithop(int tok) {
 }
 ```
 
-The default statement in the switch statement fires when we can't convert
-the given token into an AST node type. It's going to form part of the
-syntax checking in our parser.
+switch语句中的default语句块触发时机是当我们无法将给到的token转换为对应的AST节点类型的情况。这将成为我们解析器中语法检查的一部分。
 
-We need a function to check that the next token is an integer literal,
-and to build an AST node to hold the literal value. Here it is:
+我们需要一个能检查下一个标记是否是一个整数字面值，并且构建一个持有该字面值的AST节点的函数。以下就是这个函数：
 
 ```c
 // Parse a primary factor and return an
-// AST node representing it.
+// AST node representing it. 解析一个主要因子并返回表示它的AST节点。
 static struct ASTnode *primary(void) {
   struct ASTnode *n;
-
-  // For an INTLIT token, make a leaf AST node for it
-  // and scan in the next token. Otherwise, a syntax error
-  // for any other token type.
+	
+  // For an INTLIT token, make a leaf AST node for it  对一个INTLIT token，创建一个AST叶子节点
+  // and scan in the next token. Otherwise, a syntax error 并且扫描下一个scan，否则，
+  // for any other token type. 对于其他任何标记类型，都会产生语法错误。
   switch (Token.token) {
     case T_INTLIT:
       n = mkastleaf(A_INTLIT, Token.intvalue);
