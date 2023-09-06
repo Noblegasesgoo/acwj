@@ -229,9 +229,7 @@ static struct ASTnode *primary(void) {
 }
 ```
 
-This assumes that there is a global variable `Token`, and that it
-already has the most recent token scanned in from the input. In
-`data.h`:
+我们假设 `Token` 是一个全局变量，并且他已经是最近一次从输入内容中扫描到的最新值。 `data.h`:
 
 ```c
 extern_ struct token    Token;
@@ -240,46 +238,42 @@ extern_ struct token    Token;
 and in `main()`:
 
 ```c
-  scan(&Token);                 // Get the first token from the input
-  n = binexpr();                // Parse the expression in the file
+  scan(&Token);                 // Get the first token from the input 获取第一个token
+  n = binexpr();                // Parse the expression in the file 解析表达式
 ```
 
-Now we can write the code for the parser:
+现在我们可以为解析器写代码了：
 
 ```c
-// Return an AST tree whose root is a binary operator
+// Return an AST tree whose root is a binary operator 返回一个以二进制运算符为根节点的AST树
 struct ASTnode *binexpr(void) {
   struct ASTnode *n, *left, *right;
   int nodetype;
 
-  // Get the integer literal on the left.
-  // Fetch the next token at the same time.
+  // Get the integer literal on the left. 获取左树中的整数字面量的值
+  // Fetch the next token at the same time. 的同时获取下一个token
   left = primary();
 
-  // If no tokens left, return just the left node
+  // If no tokens left, return just the left node 如果左侧没有tokens，那么就只返回左侧节点
   if (Token.token == T_EOF)
     return (left);
 
-  // Convert the token into a node type
+  // Convert the token into a node type 将token转换为对应的节点类型
   nodetype = arithop(Token.token);
 
-  // Get the next token in
+  // Get the next token in 获取下一个token
   scan(&Token);
 
-  // Recursively get the right-hand tree
+  // Recursively get the right-hand tree 递归获取右树
   right = binexpr();
 
-  // Now build a tree with both sub-trees
+  // Now build a tree with both sub-trees 现在构建一个包含两个子树的树
   n = mkastnode(nodetype, left, right, 0);
   return (n);
 }
 ```
 
-Notice that nowhere in this naive parser code is there anything to
-deal with different operator precedence. As it stands, the code treats
-all operators as having equal precedence. If you follow the code as
-it parses the expression `2 * 3 + 4 * 5`, you will see that it
-builds this AST:
+注意这个简单的解析代码中没有任何处理不同操作符优先级的内容。目前，以上代码将所有操作符都视为同一优先级。如果你跟着代码解析了`2 * 3 + 4 * 5` 表达式，你将会看到这样的一棵树被创建：
 
 ```
      *
@@ -291,27 +285,25 @@ builds this AST:
        4   5
 ```
 
-This is definitely not correct. It will multiply `4*5` to get 20,
-then do `3+20` to get 23 instead of doing `2*3` to get 6.
+这显然不是正确的。这棵树中`4*5` 将得到 20，之后就开始运行 `3+20` 得到23，替代掉了原本应该的 `2*3` 得到6的过程
 
-So why did I do this? I wanted to show you that writing a simple parser
-is easy, but getting it to also do the semantic analysis is harder.
+所以我为什么这么做？我就是想要给你展示写一个简单的解析器是十分容易的事情，但是同时让其执行语义分析更难。
 
-## Interpreting the Tree
 
-Now that we have our (incorrect) AST tree, let's write some code to
-interpret it. Again, we are going to write recursive code to traverse
-the tree. Here's the pseudo-code:
+
+## 解释树
+
+现在我们有了（不正确的）AST树，让我们编写一些代码来解释它。同样，我们将编写递归代码来遍历树。以下是伪代码：
 
 ```
 interpretTree:
-  First, interpret the left-hand sub-tree and get its value
-  Then, interpret the right-hand sub-tree and get its value
-  Perform the operation in the node at the root of our tree
-  on the two sub-tree values, and return this value
+  First, interpret the left-hand sub-tree and get its value 首先，解释左子树并且获得值
+  Then, interpret the right-hand sub-tree and get its value	其次解释右子树并且活得值
+  Perform the operation in the node at the root of our tree	执行当前树根节点中的操作符
+  on the two sub-tree values, and return this value 来运算左右子树当前的值，并且返回。
 ```
 
-Going back to the correct AST tree:
+回到正确的AST树:
 
 ```
           +
@@ -323,7 +315,7 @@ Going back to the correct AST tree:
     2   3   4   5
 ```
 
-the call structure would look like:
+他的调用结构应该看起来是这样：
 
 ```
 interpretTree0(tree with +):
@@ -344,9 +336,9 @@ interpretTree0(tree with +):
   Perform 6 + 20, return 26
 ```
 
-## Code to Interpret the Tree
+## 编写解释树
 
-This is in `interp.c` and follows the above pseudo-code:
+这在`interp.c`中，遵循上面的伪代码：
 
 ```c
 // Given an AST, interpret the
@@ -379,14 +371,13 @@ int interpretAST(struct ASTnode *n) {
 }
 ```
 
-Again, the default statement in the switch statement fires when we can't 
-interpret the AST node type. It's going to form part of the
-sematic checking in our parser.
+再次提醒，switch语句块中的默认模块是来处理我们没法解释的AST节点类型。这也是我们语法解析其中的一部分。
 
-## Building the Parser
+## 构建解析器
 
-There is some other code here and the, like the call to the interpreter
-in `main()`:
+
+
+这里还有一些其他代码，比如在`main()`中调用解释器的部分。
 
 ```c
   scan(&Token);                 // Get the first token from the input
@@ -395,19 +386,14 @@ in `main()`:
   exit(0);
 ```
 
-You can now build the parser by doing:
+你可以运行以下命令来构建解析器：
 
 ```
 $ make
 cc -o parser -g expr.c interp.c main.c scan.c tree.c
 ```
 
-I've provided several input files for you to test the parser on, but 
-of course you can create your own. Remember, the calculated results
-are incorrect, but the parser should detect input errors like
-consecutive numbers, consecutive operators, and a number missing at the end
-of the input. I've also added some debugging code to the interpreter so
-you can see which AST tree nodes get evaluated in which order:
+我提供了一些输入文件来供解析器测试，不过你也可以自己去做自己的输入文件来测试。请记住，计算的结果是不正确的。不过解析器应该能够检测到类似连续数字，连续运算符，末尾缺少数字等输入错误。我还在解释器中添加了一些可供调试的方法，所以你可以看到AST树节点遍历的顺序来进行评估：
 
 ```
 $ cat input01
