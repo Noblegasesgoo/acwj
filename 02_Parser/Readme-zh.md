@@ -453,18 +453,10 @@ $ ./parser input05
 Unrecognised character a on line 1
 ```
 
-## Conclusion and What's Next
+## 结论与下一步计划
 
-A parser recognises the grammar of the language and checks that the
-input to the compiler conforms to this grammar. If it doesn't, the parser
-should print out an error message. As our expression grammar is
-recursive, we have chosen to write a recursive descent parser to
-recognise our expressions.
+解释器识别语言的语法并且检查编译器输入是否符合语法。如果不符合，编译器应该打印出错误信息。因为我们的语法是递归结构的，所以我们需要选择去写一个递归解析器来识别我们的表达式。
 
-Right now the parser works, as shown by the above output, but it fails
-to get the semantics of the input right. In other words, it doesn't
-calculate the correct value of the expressions.
+现在解析器可以工作了，就像上面输出的那样，但是它错误的获取了输入的语义。换句话说，它没有正确的计算表达式的结果。
 
-In the next part of our compiler writing journey, we will modify
-the parser so that it also does the semantic analysis of the
-expressions to get the right maths results. [Next step](../03_Precedence/Readme.md)
+在下一章节中，我们将要修改解析器以让其能正确的分析表达式语义与正确计算表达式结果。 [下一节](../03_Precedence/Readme-zh.md)
